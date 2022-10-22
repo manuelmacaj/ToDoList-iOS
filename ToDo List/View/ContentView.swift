@@ -13,7 +13,7 @@ import Combine
 struct ContentView: View {
     //MARK: -Variables
     @State private var isButtonTapped: Bool = false
-    @State private var isEditButton: Bool = false
+    @State private var editButtonTapped: Bool = false
     @State private var isItemTapped: Bool = false
     @ObservedObject var task = ToDoClass()
     //MARK: -Body
@@ -27,33 +27,35 @@ struct ContentView: View {
                 else{
                     //MARK: -List
                     List{
-                        ForEach(task.ALLToDo) {toDoElem in
-                            NavigationLink(destination: ShowToDo(toDoSelected: toDoElem)){
-                                ContentRow(todoElem: toDoElem)
+                        ForEach(task.ALLToDo.indices, id: \.self) {idToDo in
+                            NavigationLink(destination: ShowToDo(toDoSelected: $task.ALLToDo[idToDo])){
+                                ContentRow(todoElem: $task.ALLToDo[idToDo])
                                     .contextMenu {
                                         Button {
                                             print("Edit apthic touch tapped")
-                                            isEditButton = true
+                                            
                                         } label: {
                                             Label("Edit", systemImage: "pencil")
                                         }
                                         Button {
                                             // Open Maps and center it on this item.
+                                            print("ContentView: Delete apthic touch tapped")
+                                            deleteItemFromList(id: idToDo)
                                         } label: {
                                             Label("Delete", systemImage: "delete.left.fill")
                                         }
                                         Divider()
-                                        if(toDoElem.fatto == false) {
+                                        if(task.ALLToDo[idToDo].fatto == false) {
                                             Button{
-                                                markToDoCompleted(toDoSelected: toDoElem)
-                                                print("Mark apthic touch tapped")
+                                                task.ALLToDo[idToDo].fatto = true
+                                                print("ContentView: Mark apthic touch tapped")
                                                 
                                             } label: {
                                                 Label("Mark as completed", systemImage: "checkmark")
                                             }
                                         }
                                     } preview: {
-                                        ShowToDo(toDoSelected: toDoElem)
+                                        ShowToDo(toDoSelected: $task.ALLToDo[idToDo])
                                     }
                             }
                         }
@@ -79,26 +81,18 @@ struct ContentView: View {
     private func delete(offset: IndexSet) {
         self.task.ALLToDo.remove(atOffsets: offset)
     }
-    private func markToDoCompleted(toDoSelected: ToDo) {
-        var currentToDo = toDoSelected
-        task.ALLToDo.remove(at: (Int(toDoSelected.id)! - 1))
-        currentToDo.fatto = true
-        task.ALLToDo.append(currentToDo)
+    private func deleteItemFromList(id: Int){
+        task.ALLToDo.remove(at: id)
     }
 }
 
 //MARK: - ContentRow struct
 struct ContentRow: View {
-    let todoElem: ToDo
+    @Binding var todoElem: ToDo
+    @State private var isShowToDoTapped: Bool = false
     var body: some View {
         VStack {
-            HStack{
-                Text(todoElem.id)
-                    .font(.largeTitle)
-                    .bold()
-                    .foregroundColor(.red)
-                Text(todoElem.todo)
-            }
+            Text(todoElem.todo)
         }
     }
 }
@@ -108,11 +102,6 @@ struct ContentView_Previews: PreviewProvider {
         ContentView()
     }
 };
-struct ContentRow_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentRow(todoElem: ToDo(id: String(1), todo: "Prova Testo", currentTime: Date.now.ISO8601Format(), fatto: false))
-    }
-}
 
 
 

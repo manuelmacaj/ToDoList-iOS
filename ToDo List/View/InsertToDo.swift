@@ -13,7 +13,10 @@ struct InsertToDo: View {
     @Environment(\.dismiss) var dismiss
     @State private var todotext: String = ""
     @State private var sendTapped = false
-
+    @State private var titleAlert = ""
+    @State private var messageAlert = ""
+    @State private var showAlertMessage = false
+    
     //MARK: -Body
     var body: some View {
         NavigationView {
@@ -50,12 +53,19 @@ struct InsertToDo: View {
         .onDisappear() {
             print("Finestra chiusa")
         }
+        .alert(isPresented: $showAlertMessage, content: {
+            Alert(title: Text(titleAlert), message: Text(messageAlert), dismissButton: .default(Text("Ok")))
+        })
     }
     
     //MARK: -FUNCTIONS
-
+    
     func saveToDo() {
         guard todotext != "" else {
+            print("saveToDo not allowes")
+            titleAlert="Save not working"
+            messageAlert="You didn't write nothing. Please, make sure to complete the textfiled before save."
+            showAlertMessage = true
             return
         }
         let newTodo = ToDo(id:String(task.ALLToDo.count + 1), todo: todotext, currentTime: Date.now.ISO8601Format(), fatto: false)

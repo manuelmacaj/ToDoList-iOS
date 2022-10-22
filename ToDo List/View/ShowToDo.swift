@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ShowToDo: View {
     //MARK: -Variables
-    let toDoSelected: ToDo
+    @Binding var toDoSelected: ToDo
     var body: some View {
         VStack {
             Form {
@@ -20,12 +20,7 @@ struct ShowToDo: View {
                 Text("\(date)")
                 Text("\(String(toDoSelected.fatto))")}
             }
+            .navigationTitle(Text("Detail todo"))
         }
-    }
-}
-
-struct ShowToDo_Previews: PreviewProvider {
-    static var previews: some View {
-        ShowToDo(toDoSelected: ToDo(id: String(1), todo: "Prova Testo", currentTime: Date.now.ISO8601Format(), fatto: false))
     }
 }
